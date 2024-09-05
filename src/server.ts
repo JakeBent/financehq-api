@@ -1,14 +1,23 @@
 import express from 'express';
 import { createYoga } from 'graphql-yoga';
 
-const server = express();
+export default class Server {
+  public server: express.Application;
 
-const yoga = createYoga({
-  graphqlEndpoint: '/',
-});
+  constructor() {
+    this.server = express();
+  }
 
-server.use(yoga.graphqlEndpoint, yoga);
+  async register() {
+    const yoga = createYoga({
+      graphqlEndpoint: '/',
+    });
+    this.server.use(yoga.graphqlEndpoint, yoga);
+  }
 
-server.listen(3000, () => {
-  console.log('running at /graphql');
-});
+  async start() {
+    this.server.listen(3000, () => {
+      console.log('running at /graphql');
+    });
+  }
+}
