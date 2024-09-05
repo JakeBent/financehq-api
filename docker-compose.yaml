@@ -1,0 +1,21 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    restart: always
+    env_file: [.env]
+    ports: [$POSTGRES_PORT:$POSTGRES_PORT]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+  api:
+    build:
+      context: .
+    env_file: [.env]
+    ports: [$PORT:$PORT]
+    working_dir: /app
+    volumes: [./:/app]
+    depends_on: [postgres]
+    command: npm run dev
+
+volumes:
+  postgres-data:
+

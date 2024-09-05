@@ -31,7 +31,7 @@ export default class Server {
 
   async start() {
     this.server.listen(config.port, () => {
-      console.log(`running at http://localhost:${config.port}/graphql`);
+      console.log(`Now running at http://localhost:${config.port}/graphql`);
     });
   }
 }
