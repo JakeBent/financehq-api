@@ -1,7 +1,9 @@
+## Prerequesites
+
+* Docker is installed
+
 ## Installation
 
 * Clone the directory and cd into it.
-* `npm install`
-* `npx prisma generate`
-* `npx prisma migrate dev --name init`
-* `npm start:dev`
+* `docker-compose up`
+* `npm run db:push` in a separate terminal once application is running

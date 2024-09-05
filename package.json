@@ -7,8 +7,7 @@
     "build": "tsc",
     "start": "node/index.js",
     "dev": "ts-node-dev --respawn src/index",
-    "db:migrate": "prisma db migrate",
-    "db:push": "prisma db push",
+    "db:push": "docker exec -it financehq_api_1 npx prisma db push",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
