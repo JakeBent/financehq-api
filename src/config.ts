@@ -16,6 +16,10 @@ class Config {
   };
 
   public salt = 10;
+
+  public jwtSecret = process.env.JWT_SECRET ?? 'asdfasdf';
+
+  public jwtHeaderName = 'x-auth-token';
 }
 
 export default Config.shared;

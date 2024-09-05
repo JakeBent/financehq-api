@@ -5,10 +5,12 @@ import User from './user';
 export const typeDefs = `
   type Query {
     allUsers: [User!]!
+    me: User!
   }
 
   type Mutation {
-    signupUser(data: UserCreateDTO!): User!
+    signupUser(data: UserCreateDTO!): AuthPayload!
+    loginUser(data: UserLoginDTO!): AuthPayload!
   }
 
   type User {
@@ -22,6 +24,16 @@ export const typeDefs = `
     email: String!
     password: String!
     name: String
+  }
+
+  input UserLoginDTO {
+    email: String!
+    password: String!
+  }
+
+  type AuthPayload {
+    token: String
+    user: User
   }
 
   scalar DateTime

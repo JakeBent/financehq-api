@@ -2,7 +2,7 @@ import express from 'express';
 import { createYoga } from 'graphql-yoga';
 import helmet from 'helmet';
 import config from './config';
-import { context } from './context';
+import { createContext } from './context';
 import { schema } from './schema';
 
 export default class Server {
@@ -19,7 +19,7 @@ export default class Server {
     const yoga = createYoga({
       graphqlEndpoint: '/graphql',
       schema,
-      context,
+      context: createContext,
     });
 
     this.graphQlRouter.use(yoga);
