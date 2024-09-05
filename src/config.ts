@@ -3,7 +3,7 @@ import 'dotenv/config';
 class Config {
   static shared: Config = new Config();
 
-  public port = process.env.PORT;
+  public port = process.env.PORT ?? 3000;
 
   public helmet = {
     contentSecurityPolicy: {
@@ -14,6 +14,8 @@ class Config {
       },
     },
   };
+
+  public salt = 10;
 }
 
 export default Config.shared;

@@ -2,6 +2,8 @@ import express from 'express';
 import { createYoga } from 'graphql-yoga';
 import helmet from 'helmet';
 import config from './config';
+import { context } from './context';
+import { schema } from './schema';
 
 export default class Server {
   public server: express.Application;
@@ -15,7 +17,9 @@ export default class Server {
 
   async register() {
     const yoga = createYoga({
-      graphqlEndpoint: '/',
+      graphqlEndpoint: '/graphql',
+      schema,
+      context,
     });
 
     this.graphQlRouter.use(yoga);
@@ -26,8 +30,8 @@ export default class Server {
   }
 
   async start() {
-    this.server.listen(3000, () => {
-      console.log('running at /graphql');
+    this.server.listen(config.port, () => {
+      console.log(`running at http://localhost:${config.port}/graphql`);
     });
   }
 }
