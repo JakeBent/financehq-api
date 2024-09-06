@@ -7,6 +7,14 @@ export interface EventCreateDTO {
   startTime: Date
   endTime: Date
   category: string
+  isPrivate: boolean
+  maxAttendees?: number
+  isCancelled?: boolean
+}
+
+export interface EventUpdateDTO {
+  eventId: string
+  isCancelled: boolean
 }
 
 export interface EventReadQuery {
@@ -24,6 +32,7 @@ export default {
 
     type Mutation {
       createEvent(data: EventCreateDTO!): Event!
+      updateEvent(data: EventUpdateDTO!): Event!
     }
 
     type Event {
@@ -33,8 +42,12 @@ export default {
       location: String
       startTime: DateTime!
       endTime: DateTime!
-      organizer: User!
       category: EventCategory!
+      isPrivate: Boolean!
+      maxAttendees: Int
+      isCancelled: Boolean!
+      organizer: User!
+      registrations: [Registration!]
     }
 
     input EventCreateDTO {
@@ -44,6 +57,13 @@ export default {
       startTime: DateTime!
       endTime: DateTime!
       category: EventCategory!
+      isPrivate: Boolean!
+      maxAttendees: Int
+    }
+
+    input EventUpdateDTO {
+      eventId: String!
+      isCancelled: Boolean!
     }
 
     input EventReadQuery {
@@ -70,16 +90,9 @@ export default {
 
   Query: {
     readEvents: (_parent, args: { query: EventReadQuery }, context: Context) => {
-      if (context.user === null) {
-        throw new Error('Unauthenticated!');
-      }
-
       const query: {
         include: { organizer: boolean },
-        where: {
-          category?: string,
-          name?: { contains: string },
-        },
+        where: Record<any, any>,
         take: number,
         skip: number,
       } = {
@@ -119,6 +132,8 @@ export default {
           startTime,
           endTime,
           category,
+          isPrivate,
+          maxAttendees,
         },
       } = args;
 
@@ -130,11 +145,37 @@ export default {
           startTime,
           endTime,
           category,
+          isPrivate,
+          maxAttendees,
+          isCancelled: false,
           organizerId: context.user.id,
         },
         include: {
           organizer: true,
         },
+      });
+
+      return event;
+    },
+
+    updateEvent: async (
+      _parent,
+      args: { data: EventUpdateDTO },
+      context: Context,
+    ) => {
+      if (context.user === null) {
+        throw new Error('Unauthenticated!');
+      }
+
+      const { data: { eventId, isCancelled } } = args;
+
+      const event = await context.prisma.event.update({
+        where: {
+          id: eventId,
+          organizerId: context.user.id,
+        },
+        data: { isCancelled },
+        include: { organizer: true },
       });
 
       return event;

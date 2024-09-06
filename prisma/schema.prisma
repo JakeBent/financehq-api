@@ -25,6 +25,9 @@ model Event {
   startTime     DateTime
   endTime       DateTime
   category      String
+  isPrivate     Boolean
+  maxAttendees  Int?
+  isCancelled   Boolean
   organizer     User @relation(fields: [organizerId], references: [id])
   organizerId   String
   registrations Registration[]

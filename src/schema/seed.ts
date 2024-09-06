@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import Chance from 'chance';
 import moment from 'moment';
 import { EventCreateDTO } from './event';
@@ -33,6 +34,9 @@ const createEvent = (): EventCreateDTO => {
     startTime: startTime.toDate(),
     endTime: endTime.toDate(),
     category: randomCategory(),
+    isPrivate: chance.bool(),
+    maxAttendees: chance.d100(),
+    isCancelled: chance.bool(),
   };
 };
 
@@ -41,9 +45,10 @@ async function main() {
 
   let eventsCount = 0;
   const users = await Promise.all(Array.from({ length: 1000 }).map(() => {
+    const password = bcrypt.hashSync('asdfasdf', 10);
     const args = {
       email: chance.email(),
-      password: 'asdfasdf',
+      password,
       name: chance.name(),
       events: {},
     };

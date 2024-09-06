@@ -47,7 +47,7 @@ export default {
   },
 
   Mutation: {
-    createRegistration: (
+    createRegistration: async (
       _parent,
       args: { data: RegistrationCreateDTO },
       context: Context,
@@ -60,9 +60,27 @@ export default {
         data: { eventId },
       } = args;
 
+      const event = await context.prisma.event.findUniqueOrThrow({
+        where: { id: eventId },
+        include: {
+          registrations: {
+            where: {
+              status: 'APPROVED',
+            },
+          },
+        },
+      });
+
+      let status = 'APPROVED';
+      if (event.isPrivate
+        || (event.maxAttendees && event.maxAttendees <= event.registrations.length)
+      ) {
+        status = 'PENDING';
+      }
+
       return context.prisma.registration.create({
         data: {
-          status: 'APPROVED',
+          status,
           attendeeId: context.user.id,
           eventId,
         },
