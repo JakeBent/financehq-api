@@ -6,18 +6,74 @@ interface EventCreateDTO {
   location?: string
   startTime: Date
   endTime: Date
+  category: string
 }
 
 export default {
+  TypeDefs: `
+    type Query {
+      readEvents(category: EventCategory): [Event!]!
+    }
+
+    type Mutation {
+      createEvent(data: EventCreateDTO!): Event!
+    }
+
+    type Event {
+      id: String!
+      name: String!
+      description: String
+      location: String
+      startTime: DateTime!
+      endTime: DateTime!
+      organizer: User!
+      category: EventCategory!
+    }
+
+    input EventCreateDTO {
+      name: String!
+      description: String
+      location: String
+      startTime: DateTime!
+      endTime: DateTime!
+      category: EventCategory!
+    }
+
+    enum EventCategory {
+      PARTY
+      CONVENTION
+      SPORTS
+      TRADE
+      CHARITY
+      FESTIVAL
+      NETWORK
+      LAUNCH
+      SEMINAR
+      CONCERT
+      EXHIBIT
+    }
+  `,
+
   Query: {
-    readEvents: (_parent, _args, context: Context) => {
+    readEvents: (_parent, args: { category: string }, context: Context) => {
       if (context.user === null) {
         throw new Error('Unauthenticated!');
       }
 
-      return context.prisma.event.findMany({ include: { organizer: true } });
+      const query: { include: Record<any, any>, where?: Record<any, any> } = {
+        include: { organizer: true },
+      };
+
+      const { category } = args;
+
+      if (category) {
+        query.where = { category };
+      }
+
+      return context.prisma.event.findMany(query);
     },
   },
+
   Mutation: {
     createEvent: async (
       _parent,
@@ -35,6 +91,7 @@ export default {
           location,
           startTime,
           endTime,
+          category,
         },
       } = args;
 
@@ -45,6 +102,7 @@ export default {
           location,
           startTime,
           endTime,
+          category,
           organizerId: context.user.id,
         },
         include: {

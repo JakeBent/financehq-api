@@ -19,6 +19,41 @@ interface UserUpdateDTO {
 }
 
 export default {
+  TypeDefs: `
+    type Query {
+      allUsers: [User!]!
+      me: User!
+    }
+
+    type Mutation {
+      signupUser(data: UserCreateDTO!): AuthPayload!
+      loginUser(data: UserLoginDTO!): AuthPayload!
+      updateMe(data: UserUpdateDTO!): User!
+    }
+
+    type User {
+      id: String!
+      email: String!
+      password: String!
+      name: String
+      events: [Event!]
+    }
+
+    input UserCreateDTO {
+      email: String!
+      password: String!
+      name: String
+    }
+
+    input UserLoginDTO {
+      email: String!
+      password: String!
+    }
+
+    input UserUpdateDTO {
+      name: String
+    }
+  `,
   Query: {
     allUsers: (_parent, _args, context: Context) => context.prisma.user.findMany(),
 

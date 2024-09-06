@@ -23,6 +23,7 @@ model Event {
   location    String?
   startTime   DateTime
   endTime     DateTime
+  category    String
   organizer   User @relation(fields: [organizerId], references: [id])
   organizerId String
 }
