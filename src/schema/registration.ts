@@ -14,6 +14,7 @@ export default {
     type Mutation {
       createRegistration(data: RegistrationCreateDTO!): Registration!
       cancelRegistration(registrationId: String!): Registration!
+      approveRegistration(registrationId: String!): Registration!
     }
 
     type Registration {
@@ -122,6 +123,40 @@ export default {
           id: registrationId,
         },
         data: { status: 'CANCELLED' },
+        include: {
+          event: true,
+          attendee: true,
+        },
+      });
+    },
+
+    approveRegistration: async (
+      _parent,
+      args: { registrationId: string },
+      context: Context,
+    ) => {
+      if (context.user === null) {
+        throw new Error('Unauthenticated!');
+      }
+
+      const { registrationId } = args;
+
+      const registration = await context.prisma.registration.findUniqueOrThrow({
+        where: {
+          id: registrationId,
+        },
+        include: { event: true },
+      });
+
+      if (registration.event.organizerId !== context.user.id) {
+        throw new Error('Only the organizer can approve');
+      }
+
+      return context.prisma.registration.update({
+        where: {
+          id: registrationId,
+        },
+        data: { status: 'APPROVED' },
         include: {
           event: true,
           attendee: true,
