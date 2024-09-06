@@ -96,7 +96,7 @@ export default {
         take: number,
         skip: number,
       } = {
-        where: {},
+        where: { isPrivate: false },
         include: { organizer: true },
         take: args?.query?.take ?? 20,
         skip: args?.query?.skip ?? 0,
