@@ -14,6 +14,10 @@ interface UserLoginDTO {
   password: string
 }
 
+interface UserUpdateDTO {
+  name?: string
+}
+
 export default {
   Query: {
     allUsers: (_parent, _args, context: Context) => context.prisma.user.findMany(),
@@ -81,6 +85,27 @@ export default {
       const token = sign({ userId: user.id }, config.jwtSecret);
 
       return { token, user };
+    },
+
+    updateMe: async (
+      _parent,
+      args: { data: UserUpdateDTO },
+      context: Context,
+    ) => {
+      if (!context.user) {
+        throw new Error('Not Authorized');
+      }
+
+      const {
+        data: { name },
+      } = args;
+
+      const updatedUser = context.prisma.user.update({
+        where: { id: context.user.id },
+        data: { name },
+      });
+
+      return updatedUser;
     },
   },
 };

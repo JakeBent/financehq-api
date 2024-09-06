@@ -11,6 +11,7 @@ export const typeDefs = `
   type Mutation {
     signupUser(data: UserCreateDTO!): AuthPayload!
     loginUser(data: UserLoginDTO!): AuthPayload!
+    updateMe(data: UserUpdateDTO!): User!
   }
 
   type User {
@@ -29,6 +30,10 @@ export const typeDefs = `
   input UserLoginDTO {
     email: String!
     password: String!
+  }
+
+  input UserUpdateDTO {
+    name: String
   }
 
   type AuthPayload {
