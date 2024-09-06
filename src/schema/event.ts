@@ -9,10 +9,17 @@ export interface EventCreateDTO {
   category: string
 }
 
+export interface EventReadQuery {
+  name?: string
+  category?: string
+  take?: number
+  skip?: number
+}
+
 export default {
   TypeDefs: `
     type Query {
-      readEvents(category: EventCategory): [Event!]!
+      readEvents(query: EventReadQuery!): [Event!]!
     }
 
     type Mutation {
@@ -39,6 +46,13 @@ export default {
       category: EventCategory!
     }
 
+    input EventReadQuery {
+      category: EventCategory
+      name: String
+      take: Int
+      skip: Int
+    }
+
     enum EventCategory {
       PARTY
       CONVENTION
@@ -55,19 +69,38 @@ export default {
   `,
 
   Query: {
-    readEvents: (_parent, args: { category: string }, context: Context) => {
+    readEvents: (_parent, args: { query: EventReadQuery }, context: Context) => {
       if (context.user === null) {
         throw new Error('Unauthenticated!');
       }
 
-      const query: { include: Record<any, any>, where?: Record<any, any> } = {
+      const {
+        query: {
+          category, name, take, skip,
+        },
+      } = args;
+
+      const query: {
+        include: { organizer: boolean },
+        where: {
+          category?: string,
+          name?: { contains: string },
+        },
+        take: number,
+        skip: number,
+      } = {
+        where: {},
         include: { organizer: true },
+        take: take ?? 20,
+        skip: skip ?? 0,
       };
 
-      const { category } = args;
-
       if (category) {
-        query.where = { category };
+        query.where.category = category;
+      }
+
+      if (name) {
+        query.where.name = { contains: name };
       }
 
       return context.prisma.event.findMany(query);
