@@ -17,3 +17,4 @@ To make an authenticated request, set your request's `x-auth-token` header to `B
 ## Considerations/Compromises
 
 * Enum for categories instead of separate model with 1-n relationship
+* Ran out of time for tests or integration with deployment tool
