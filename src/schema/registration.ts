@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Context } from '../context';
 
 export interface RegistrationCreateDTO {
@@ -12,6 +13,7 @@ export default {
 
     type Mutation {
       createRegistration(data: RegistrationCreateDTO!): Registration!
+      cancelRegistration(registrationId: String!): Registration!
     }
 
     type Registration {
@@ -84,6 +86,42 @@ export default {
           attendeeId: context.user.id,
           eventId,
         },
+        include: {
+          event: true,
+          attendee: true,
+        },
+      });
+    },
+
+    cancelRegistration: async (
+      _parent,
+      args: { registrationId: string },
+      context: Context,
+    ) => {
+      if (context.user === null) {
+        throw new Error('Unauthenticated!');
+      }
+
+      const { registrationId } = args;
+
+      const registration = await context.prisma.registration.findUniqueOrThrow({
+        where: {
+          attendeeId: context.user.id,
+          id: registrationId,
+        },
+        include: { event: true },
+      });
+
+      if (moment(registration.event.startTime).isBefore(moment().add(24, 'hours'))) {
+        throw new Error('Event is too soon to cancel');
+      }
+
+      return context.prisma.registration.update({
+        where: {
+          attendeeId: context.user.id,
+          id: registrationId,
+        },
+        data: { status: 'CANCELLED' },
         include: {
           event: true,
           attendee: true,
