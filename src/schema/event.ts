@@ -19,7 +19,7 @@ export interface EventReadQuery {
 export default {
   TypeDefs: `
     type Query {
-      readEvents(query: EventReadQuery!): [Event!]!
+      readEvents(query: EventReadQuery): [Event!]!
     }
 
     type Mutation {
@@ -74,12 +74,6 @@ export default {
         throw new Error('Unauthenticated!');
       }
 
-      const {
-        query: {
-          category, name, take, skip,
-        },
-      } = args;
-
       const query: {
         include: { organizer: boolean },
         where: {
@@ -91,16 +85,16 @@ export default {
       } = {
         where: {},
         include: { organizer: true },
-        take: take ?? 20,
-        skip: skip ?? 0,
+        take: args?.query?.take ?? 20,
+        skip: args?.query?.skip ?? 0,
       };
 
-      if (category) {
-        query.where.category = category;
+      if (args?.query?.category) {
+        query.where.category = args.query.category;
       }
 
-      if (name) {
-        query.where.name = { contains: name };
+      if (args?.query?.name) {
+        query.where.name = { contains: args.query.name };
       }
 
       return context.prisma.event.findMany(query);

@@ -21,7 +21,6 @@ interface UserUpdateDTO {
 export default {
   TypeDefs: `
     type Query {
-      allUsers: [User!]!
       me: User!
     }
 
@@ -55,8 +54,6 @@ export default {
     }
   `,
   Query: {
-    allUsers: (_parent, _args, context: Context) => context.prisma.user.findMany(),
-
     me: (_parent, _args, context: Context) => {
       if (context.user === null) {
         throw new Error('Unauthenticated!');

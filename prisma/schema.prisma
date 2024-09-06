@@ -9,21 +9,32 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
-  name     String?
-  events   Event[]
+  id            String @id @default(uuid())
+  email         String @unique
+  password      String
+  name          String?
+  events        Event[]
+  registrations Registration[]
 }
 
 model Event {
+  id            String @id @default(uuid())
+  name          String
+  description   String?
+  location      String?
+  startTime     DateTime
+  endTime       DateTime
+  category      String
+  organizer     User @relation(fields: [organizerId], references: [id])
+  organizerId   String
+  registrations Registration[]
+}
+
+model Registration {
   id          String @id @default(uuid())
-  name        String
-  description String?
-  location    String?
-  startTime   DateTime
-  endTime     DateTime
-  category    String
-  organizer   User @relation(fields: [organizerId], references: [id])
-  organizerId String
+  status      String
+  attendee    User @relation(fields: [attendeeId], references: [id])
+  attendeeId  String
+  event       Event @relation(fields: [eventId], references: [id])
+  eventId     String
 }
