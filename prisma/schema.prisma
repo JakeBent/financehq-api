@@ -9,8 +9,20 @@ datasource db {
 }
 
 model User {
-  id       Int @id @default(autoincrement())
+  id       String @id @default(uuid())
   email    String @unique
   password String
   name     String?
+  events   Event[]
+}
+
+model Event {
+  id          String @id @default(uuid())
+  name        String
+  description String?
+  location    String?
+  startTime   DateTime
+  endTime     DateTime
+  organizer   User @relation(fields: [organizerId], references: [id])
+  organizerId String
 }
