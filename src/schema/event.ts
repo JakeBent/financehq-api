@@ -1,6 +1,6 @@
 import { Context } from '../context';
 
-interface EventCreateDTO {
+export interface EventCreateDTO {
   name: string
   description?: string
   location?: string
